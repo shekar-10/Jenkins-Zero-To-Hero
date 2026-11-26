@@ -10,3 +10,27 @@ pipeline {
     }
   }
 }
+
+
+---
+pipeline {
+  agent any
+  stages {
+    stage('Test') {
+      agent {
+        docker { image 'node:16-alpine' }
+      }
+      steps {
+        sh 'node --version'
+      }
+    }
+    stage('Run Persistent Container') {
+      steps {
+        sh '''
+          docker rm -f my-node-app || true
+          docker run -dit --name my-node-app --restart unless-stopped node:16-alpine
+        '''
+      }
+    }
+  }
+}
